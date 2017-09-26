@@ -1,0 +1,75 @@
+# Default Port for Config Server is 8888
+#spring.cloud.config.server.git.uri: file:///${PWD}/../../../../blog-microservices-config
+server:
+  port: 8888
+#  ssl:
+#    key-store: classpath:server.jks
+#    key-store-password: password
+#    key-password: password
+
+security:
+  basic:
+    enabled: false
+
+# Configuration of a local Git-repo for development locally without Docker
+# note that we are still using git; We just access the git-repo via file: protocol  
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/lnrajput/ms-config-repo.git
+          username: lnrajput
+          password: Harshil01!
+          search-paths:
+          - application.xml
+          force-pull: true
+        encrypt:
+          enabled: false
+rabbitmq:
+    host: localhost
+    port: 5672
+    
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8765/eureka/
+
+logging:
+  level:
+    root: WARN
+    com.acc.ms: INFO
+
+    org.springframework.amqp.rabbit.listener.BlockingQueueConsumer: INFO
+    org.apache.catalina.session.ManagerBase: INFO
+    # Set INFO to see the allocated port
+    org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer: INFO  
+
+---
+# For deployment in Docker containers
+spring:
+  profiles: docker
+  rabbitmq:
+    host: rabbitmq
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/lnrajput/ms-config-repo.git
+          force-pull: true
+          search-paths:
+          - ms-config-repo
+        encrypt:
+          enabled: false
+    
+security:
+  basic:
+    enabled: true
+    
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    service-url:
+      defaultZone: http://localhost:8765/eureka/      
+
